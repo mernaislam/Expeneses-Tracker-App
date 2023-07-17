@@ -1,9 +1,10 @@
 import 'package:expense_tracker/model/expense.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 
 class NewExpense extends StatefulWidget {
-  const NewExpense({super.key});
+  const NewExpense({super.key, required this.onAddExpense});
+
+  final void Function(Expense expense) onAddExpense;
 
   @override
   State<StatefulWidget> createState() {
@@ -39,10 +40,45 @@ class _NewExpenseState extends State<NewExpense> {
     });
   }
 
+  void _submitExpenseData() {
+    final enteredAmount = double.tryParse(_amountController.text);
+    final inValidAmount = enteredAmount == null || enteredAmount <= 0;
+    if (inValidAmount ||
+        _selectedDate == null ||
+        _titleController.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Invalid Expense!'),
+          content: const Text(
+              'Please make sure to enter a valid title, amount, date and category'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('Ok'),
+            )
+          ],
+        ),
+      );
+      return;
+    }
+
+    widget.onAddExpense(
+      Expense(
+          amount: enteredAmount,
+          category: _choosenCategory,
+          date: _selectedDate!,
+          title: _titleController.text),
+    );
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(16.0),
+      padding: const EdgeInsets.fromLTRB(16, 48, 16, 16),
       child: Column(
         children: [
           TextField(
@@ -83,7 +119,9 @@ class _NewExpenseState extends State<NewExpense> {
               )
             ],
           ),
-          const SizedBox(height: 30,),
+          const SizedBox(
+            height: 30,
+          ),
           Row(
             children: [
               DropdownButton(
@@ -115,11 +153,8 @@ class _NewExpenseState extends State<NewExpense> {
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
-                onPressed: () {
-                  print(_titleController.text);
-                  print(_amountController.text);
-                },
-                child: const Text('Save Expense'),
+                onPressed: _submitExpenseData,
+                child: const Text('Save'),
               )
             ],
           )
