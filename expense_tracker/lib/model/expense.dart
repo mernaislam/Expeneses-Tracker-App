@@ -15,12 +15,13 @@ const categoryIcon = {
 };
 
 class Expense {
-  Expense(
-      {required this.amount,
-      required this.title,
-      required this.category,
-      required this.date})
-      : id = uuid.v4();
+  Expense({
+    required this.amount,
+    required this.title,
+    required this.category,
+    required this.date,
+  }) : id = uuid.v4();
+
   final String id;
   final double amount;
   final String title;
@@ -33,7 +34,10 @@ class Expense {
 }
 
 class ExpenseBucket {
-  const ExpenseBucket({required this.category, required this.expenses});
+  const ExpenseBucket({
+    required this.category,
+    required this.expenses,
+  });
 
   ExpenseBucket.forCategory(List<Expense> allExpenses, this.category)
       : expenses = allExpenses
